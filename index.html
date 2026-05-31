@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryoNode Investor POC</title>
+  <style>
+    :root {
+      --bg: #071016;
+      --panel: #0d1820;
+      --panel-2: #11232e;
+      --text: #eef7fb;
+      --muted: #8ca6b4;
+      --cyan: #00c8e0;
+      --cyan-soft: rgba(0, 200, 224, 0.14);
+      --border: rgba(255, 255, 255, 0.1);
+      --green: #4ade80;
+      --warning: #fbbf24;
+      --shadow: 0 30px 80px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(0,200,224,0.18), transparent 34%),
+        radial-gradient(circle at 80% 20%, rgba(59,130,246,0.12), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: rgba(7,16,22,0.76);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-size: 22px;
+    }
+
+    .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), #7dd3fc);
+      box-shadow: 0 0 34px rgba(0,200,224,0.35);
+      position: relative;
+    }
+
+    .mark:after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      background: var(--bg);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #041014;
+      border-color: var(--cyan);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .hero {
+      padding: 92px 0 70px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 44px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      border: 1px solid rgba(0,200,224,0.25);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(48px, 7vw, 86px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      max-width: 760px;
+      margin-bottom: 26px;
+    }
+
+    h1 span { color: var(--cyan); }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 680px;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .trust-row {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .trust-row strong { color: var(--text); }
+
+    .hero-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-big {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      color: var(--cyan);
+      line-height: 1;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      margin: 8px 0 24px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .mini {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .mini strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .mini span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section { padding: 72px 0; }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 34px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 16px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .card h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      letter-spacing: -0.03em;
+    }
+
+    .card p, .card li { color: var(--muted); }
+
+    .card ul {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .card li:before {
+      content: "✓";
+      color: var(--green);
+      margin-right: 8px;
+      font-weight: 900;
+    }
+
+    .highlight-card {
+      background: linear-gradient(180deg, rgba(0,200,224,0.12), rgba(255,255,255,0.03));
+      border-color: rgba(0,200,224,0.3);
+    }
+
+    .architecture {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 28px;
+      overflow: hidden;
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .arch-box {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 120px;
+    }
+
+    .arch-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--cyan);
+    }
+
+    .arch-box span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+    }
+
+    .table th, .table td {
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .table th {
+      color: var(--cyan);
+      background: rgba(0,200,224,0.08);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .table td { color: var(--muted); }
+    .table tr:last-child td { border-bottom: 0; }
+    .table strong { color: var(--text); }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 18px;
+      padding: 22px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+    }
+
+    .step strong {
+      color: var(--cyan);
+    }
+
+    .step p { color: var(--muted); }
+
+    .cta {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(0,200,224,0.18), rgba(255,255,255,0.04));
+      border: 1px solid rgba(0,200,224,0.25);
+      border-radius: 34px;
+      padding: 54px 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .cta h2 {
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 680px;
+      margin: 0 auto 28px;
+      font-size: 18px;
+    }
+
+    footer {
+      padding: 36px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid, .cards, .arch-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .step { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="container nav-inner">
+      <a href="#" class="brand"><span class="mark"></span>CryoNode</a>
+      <div class="nav-links">
+        <a href="#why">Why Canada</a>
+        <a href="#poc">POC</a>
+        <a href="#model">Model</a>
+        <a href="#invest">Invest</a>
+      </div>
+      <a class="btn btn-primary" href="mailto:invest@cryonode.ca">Investor Access</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Investor POC · Manitoba First</div>
+          <h1>Canada’s cold climate can become <span>AI infrastructure.</span></h1>
+          <p>CryoNode is building a distributed sovereign AI compute network using modular GPU nodes, winter free cooling, clean hydroelectricity, and building-level heat recovery.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#invest">View Investment Thesis</a>
+            <a class="btn" href="#poc">See POC Plan</a>
+          </div>
+          <div class="trust-row">
+            <span><strong>Phase 1:</strong> Manitoba pilot</span>
+            <span><strong>Load:</strong> 12–25 kW</span>
+            <span><strong>Model:</strong> GPU-hours + heat recovery</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="metric-big">8+ months</div>
+          <div class="metric-label">of free-cooling potential in Winnipeg-class climates</div>
+          <div class="mini-grid">
+            <div class="mini"><strong>1.10–1.20</strong><span>Target cold-season PUE</span></div>
+            <div class="mini"><strong>4 GPUs</strong><span>POC starting node</span></div>
+            <div class="mini"><strong>90 days</strong><span>Validation run</span></div>
+            <div class="mini"><strong>Canada</strong><span>Sovereign compute</span></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="why">
+      <div class="container">
+        <div class="section-head">
+          <h2>Why this works in Canada</h2>
+          <p>AI infrastructure is constrained by power, cooling, carbon, and jurisdiction. Canada has structural advantages in all four.</p>
+        </div>
+        <div class="cards">
+          <div class="card">
+            <h3>Cold climate</h3>
+            <p>Winnipeg, Regina, Saskatoon, and Edmonton offer long free-cooling seasons that reduce mechanical cooling needs.</p>
+          </div>
+          <div class="card">
+            <h3>Clean power</h3>
+            <p>Hydroelectric-heavy grids improve the economics and ESG profile of AI compute.</p>
+          </div>
+          <div class="card">
+            <h3>Sovereign AI</h3>
+            <p>Healthcare, government, universities, and finance need Canadian-hosted AI infrastructure.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="poc">
+      <div class="container">
+        <div class="section-head">
+          <h2>Proof of Concept</h2>
+          <p>Start with one commercial or institutional site. Avoid residential complexity until reliability is proven.</p>
+        </div>
+        <table class="table">
+          <tr><th>Category</th><th>POC Specification</th></tr>
+          <tr><td><strong>Location</strong></td><td>Manitoba commercial building, greenhouse, community centre, church, or school</td></tr>
+          <tr><td><strong>Compute</strong></td><td>4 enterprise GPUs, 512GB–1TB ECC memory, NVMe storage, dual 25GbE NICs</td></tr>
+          <tr><td><strong>Power</strong></td><td>Dedicated 80A–125A circuit, submetering, UPS, smart breaker, emergency shutoff</td></tr>
+          <tr><td><strong>Cooling</strong></td><td>Direct-to-chip liquid cooling, glycol loop, redundant pumps, outdoor dry cooler</td></tr>
+          <tr><td><strong>Heat Recovery</strong></td><td>Plate heat exchanger tied to hydronic heating loop where available</td></tr>
+          <tr><td><strong>Software</strong></td><td>Kubernetes, NVIDIA GPU Operator, WireGuard, Prometheus, Grafana, billing engine</td></tr>
+          <tr><td><strong>Validation</strong></td><td>90-day runtime, target 95%+ uptime, measured PUE, measured recovered heat</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="container">
+        <div class="section-head">
+          <h2>System architecture</h2>
+          <p>CryoNode operates like a distributed cloud platform, not a collection of unmanaged GPU boxes.</p>
+        </div>
+        <div class="architecture">
+          <div class="arch-grid">
+            <div class="arch-box"><strong>Customer API</strong><span>Developers submit AI jobs, inference workloads, or private clusters.</span></div>
+            <div class="arch-box"><strong>Control Plane</strong><span>Schedules workloads, tracks utilization, billing, health, and policy.</span></div>
+            <div class="arch-box"><strong>Secure Mesh</strong><span>WireGuard private network. No exposed node access.</span></div>
+            <div class="arch-box"><strong>CryoNode Unit</strong><span>GPU server, liquid cooling, sensors, UPS, and remote management.</span></div>
+            <div class="arch-box"><strong>Heat Loop</strong><span>Rejected heat can support space heating or greenhouse loads.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="model">
+      <div class="container">
+        <div class="section-head">
+          <h2>Business model</h2>
+          <p>Three revenue streams reduce dependence on one market and improve site-level economics.</p>
+        </div>
+        <div class="cards">
+          <div class="card highlight-card">
+            <h3>GPU compute</h3>
+            <p>Sell GPU-hours to AI startups, SMEs, universities, and enterprise customers needing Canadian-hosted compute.</p>
+            <ul><li>Inference</li><li>Fine-tuning</li><li>Batch workloads</li></ul>
+          </div>
+          <div class="card">
+            <h3>Host partnerships</h3>
+            <p>Buildings receive revenue share, free or subsidized connectivity, and energy value from heat recovery.</p>
+            <ul><li>Commercial buildings</li><li>Municipal sites</li><li>Greenhouses</li></ul>
+          </div>
+          <div class="card">
+            <h3>Clean-tech upside</h3>
+            <p>Hardware R&D, energy efficiency, and heat reuse may qualify for grants, tax credits, and clean-tech support.</p>
+            <ul><li>SR&ED</li><li>NRC IRAP</li><li>Clean infrastructure pilots</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>Milestones</h2>
+          <p>The POC is designed to de-risk the platform before scaling across cold Canadian cities.</p>
+        </div>
+        <div class="timeline">
+          <div class="step"><strong>Stage 1</strong><p>Build CryoNode-1A, deploy at one Manitoba site, validate cooling, safety, monitoring, and remote control.</p></div>
+          <div class="step"><strong>Stage 2</strong><p>Run paid workloads with design partners. Measure GPU utilization, uptime, PUE, and heat recovery value.</p></div>
+          <div class="step"><strong>Stage 3</strong><p>Deploy 5–10 nodes across Manitoba and Saskatchewan. Prove fleet orchestration and billing.</p></div>
+          <div class="step"><strong>Stage 4</strong><p>Scale to 100+ nodes across Winnipeg, Regina, Saskatoon, Edmonton, Montreal, and Toronto suburbs.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="invest">
+      <div class="container">
+        <div class="cta">
+          <div class="eyebrow">Investment Thesis</div>
+          <h2>Invest in Canada’s climate-native AI cloud.</h2>
+          <p>CryoNode turns cold weather, clean power, and existing buildings into a distributed AI infrastructure platform. The first capital unlocks the Manitoba POC, technical validation, and early customer pilots.</p>
+          <a class="btn btn-primary" href="mailto:invest@cryonode.ca?subject=CryoNode%20Investor%20POC">Request Investor Memo</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 CryoNode. Investor POC landing page concept.
+    </div>
+  </footer>
+</body>
+</html>
